@@ -17,6 +17,6 @@ Python will update the 'profile.txt' file and send the status update to the dash
 <h3>3: Get users list</h3>
 <b>Send from that profile: </b> ["get_user_list", url (To check the status of all the profiles)] (Stringify)
 Python will send the list of profiles and its info from the file 'profiles.txt'. Python will also start all the profiles with the url given to initiate status update and keep all the profiles open for 1 minute. All the profiles will send the status update using 2nd form of socket message and update the dashboard about the status and also update the file.
+<br>
 
-
-**** Please change the command to open google-chrome in function create_profile() and open_all_profiles() according to your OS****
+* Please change the command to open google-chrome in function create_profile() and open_all_profiles() according to your OS *
