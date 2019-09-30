@@ -1,8 +1,8 @@
 <h1>Python Profile Management</h1>
 
 <b>Socket url : </b> ws://localhost:9011/ <br>
-<b>Profiles folder : </b> ./Profiles/ <br> (No need to create it)
-<b>Profiles list file : </b> ./profiles.txt <br> (No need to create it)
+<b>Profiles folder : </b> ./Profiles/ (No need to create it)<br> 
+<b>Profiles list file : </b> ./profiles.txt (No need to create it)<br> 
 
 <h2>Socket messages :</h2>
 
