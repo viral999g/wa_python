@@ -5,15 +5,24 @@ from __future__ import print_function
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 import traceback, json, time, os, sys, pymongo
 from Crypto import Random
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 sys.dont_write_bytecode = True
 
 clientInstances = {}
 
 profiles_root_dir = "./Profiles/"
+default_profile_path = profiles_root_dir + "Default"
 file_path = "./profiles.txt"
 temp_file_path = "./profiles_temp.txt"
 checking_url = "www.whatsapp.com"
+
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+
+if os.path.isdir(profiles_root_dir) == False:
+    os.system("mkdir " + profiles_root_dir)
 
 class WhatsAppWeb(WebSocket):
     client_remoteJid = None
@@ -34,7 +43,9 @@ class WhatsAppWeb(WebSocket):
         
     def create_profile(self, url, profile_id):
         profile_name = str(profile_id)
-        os.system("google-chrome " + url + " --user-data-dir=" + profiles_root_dir + profile_name + " --no-first-run --no-default-browser-check &")
+        os.system("cp -r " + default_profile_path + " " + profiles_root_dir + profile_id)
+        time.sleep(5)
+        os.system("google-chrome " + url + " --user-data-dir=" + profiles_root_dir + profile_name + " --no-default-browser-check &")
 
     def update_file(self, mobile_no, profile_id, status):
         timestamp = int(time.time())
@@ -76,7 +87,12 @@ class WhatsAppWeb(WebSocket):
         file = open(file_path, "r")
         for line in file:
             profile_id = json.loads(line.replace("\n", ""))[1]
-            os.system("timeout 1m google-chrome " + url + " --user-data-dir=" + profiles_root_dir + profile_id + " --no-first-run --no-default-browser-check &")
+            chrome_options.add_argument("--user-data-dir=" + profiles_root_dir + profile_id)
+            chrome_options.add_experimental_option("detach", True)
+            driver = webdriver.Chrome(chrome_options=chrome_options)
+            driver.get(url)
+
+            # os.system("timeout 1m google-chrome " + url + " --user-data-dir=" + profiles_root_dir + profile_id + " --no-first-run --no-default-browser-check &")
             
         
 
@@ -91,9 +107,11 @@ class WhatsAppWeb(WebSocket):
                 profile_id = request[2]
                 status = request[3]
                 self.update_file(mobile_no, profile_id, status)
-            elif request[0] == "get_user_list":
+            elif request[0] == "get_users":
+                checking_url = request[1]
                 clientInstances["main"] = self
-                self.send_users()
+                if request[2] == "1":
+                    self.send_users()
                 self.open_all_profiles(checking_url)
                 
         except:
