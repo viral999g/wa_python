@@ -47,6 +47,10 @@ class WhatsAppWeb(WebSocket):
         time.sleep(5)
         os.system("google-chrome " + url + " --user-data-dir=" + profiles_root_dir + profile_name + " --no-default-browser-check &")
 
+    def open_a_profile(self, url, profile_id):
+        profile_name = str(profile_id)
+        os.system("google-chrome " + url + " --user-data-dir=" + profiles_root_dir + profile_name + " --no-default-browser-check &")
+
     def update_file(self, mobile_no, profile_id, status):
         timestamp = int(time.time())
         if 'main' in clientInstances:
@@ -90,7 +94,7 @@ class WhatsAppWeb(WebSocket):
             chrome_options.add_argument("--user-data-dir=" + profiles_root_dir + profile_id)
             chrome_options.add_experimental_option("detach", True)
             driver = webdriver.Chrome(chrome_options=chrome_options)
-            driver.get(url)
+            driver.get(url)  # Url of QR code. https://whatsapp.desktop.chat
 
             # os.system("timeout 1m google-chrome " + url + " --user-data-dir=" + profiles_root_dir + profile_id + " --no-first-run --no-default-browser-check &")
             
@@ -101,7 +105,11 @@ class WhatsAppWeb(WebSocket):
         try:
             request = json.loads(self.data)
             if request[0] == "create_profile":
-                self.create_profile(request[1], request[2])
+                flag = request[3]
+                if flag == "0": # Flag = 0 - Create new profile
+                    self.create_profile(request[1], request[2])
+                elif flag == "1":
+                    self.open_a_profile(request[1], request[2]) # Flag = 1 - Open a profile
             elif request[0] == "Presence":
                 mobile_no = request[1]
                 profile_id = request[2]
@@ -110,9 +118,10 @@ class WhatsAppWeb(WebSocket):
             elif request[0] == "get_users":
                 checking_url = request[1]
                 clientInstances["main"] = self
-                if request[2] == "1":
-                    self.send_users()
-                self.open_all_profiles(checking_url)
+                self.send_users()
+
+                if request[2] == "1": # request[2] - 1(Send user list and open all the profiles), 0(Only send user list)
+                    self.open_all_profiles(checking_url)
                 
         except:
             print(traceback.format_exc())
