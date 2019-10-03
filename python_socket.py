@@ -24,6 +24,9 @@ chrome_options.add_argument("--headless")
 if os.path.isdir(profiles_root_dir) == False:
     os.system("mkdir " + profiles_root_dir)
 
+if os.path.isfile(file_path) == False:
+    os.system("cat " + file_path)
+
 class WhatsAppWeb(WebSocket):
     client_remoteJid = None
     client_file = None
